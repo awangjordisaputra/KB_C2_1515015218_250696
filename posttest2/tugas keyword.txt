@@ -1,0 +1,163 @@
+assert
+The built-in predicates assert, asserta, and assertz allow you to add to the database.
+
+?- assert(likes(mary, pizza)).
+true.
+
+?- listing.
+likes(mary, pizza).
+
+true.
+?- assert((happy(X) :- is_dog(X), walkies(X))).
+
+true.
+?- listing.
+happy(A) :-
+        is_dog(A),
+        walkies(A).
+likes(mary, pizza) .
+
+true.
+retract
+retract allows you to remove facts and rules from the database.
+
+?- retract(likes(mary, pizza)).
+
+true.
+?- listing.
+happy(A) :-
+        is_dog(A),
+        walkies(A).
+
+true.
+You might want to use a retract if you previously asserted a working hypothesis, then subsequently found evidence that the working hypothesis was wrong, or just to clear out a working memory structure between successive runs of some sub-algorithm.
+
+retractall
+% prolog
+?- assert(dog(fido)).
+?- assert(dog(rex)).
+?- assert(dog(fang)).
+
+?- retractall(dog(X)).
+
+true.
+?- listing.
+true.   %  no clauses in database.
+asserta and assertz
+assert gives no control over where in the database the new fact or rule is positioned.
+
+Remember that if there are several rules or facts with the same functor and arity, then the rule or fact listed first in the database is the one that is tried first.
+
+Thus if you asserted something in order to avoid re-inferring it later using a rule with the same functor, then you had better ensure that the new fact or rule comes before other facts/rules with the same functor/arity.
+
+asserta does this. For completeness, assertz puts the new fact/rule at the end of the database (or rather at the end of the facts/rules with the same functor and arity). In SWI Prolog assert and assertz are equivalent.
+
+Exercise: Implement fib(+N, -Result), which calculates the Nth Fibonacci number (see description above). First translate the formula for fN directly into Prolog. Test it to find out how large N can be before Prolog "dies". Then add memoization, so that Fibonacci numbers are asserta-ed into the database as soon as they are calculated. How high can you go now?
+
+dynamic
+If you load up some facts like likes(mary, pizza). from a file of prolog code, and then try to assert further facts about likes from within your Prolog session, you will get a message like this from SWI Prolog:
+
+ERROR: No permission to modify static_procedure `likes/2'
+This is to help stop you from accidentally modifying procedures using assert. If you really want to modify a procedure that you originally loaded from a file of code, you need to have included the following directive in your original file of code:
+
+% cat myfacts
+:- dynamic likes/2.
+
+likes(mary, pizza).
+likes(john, fried_rat).
+If you want to make several procedures dynamic, you can have, e.g.
+
+:- dynamic likes/2, gives/3, gives/2.
+Control Facilities
+fail is a goal that always fails
+true is a goal that always succeeds
+repeat is a goal which, suitably used, does what the name suggests.
+repeat behaves as if defined by:
+
+repeat.
+repeat :- repeat.
+So repeat succeeds when first called. On backtracking, the second clause (repeat :- repeat.) is tried, and it initiates a new call to repeat, which succeeds via the first clause, and so on.
+
+Use of repeat
+Here is an example of using repeat:
+
+dountilstop :-
+  repeat,
+  read(X),
+  (X = stop, !
+   ;
+   dosomethingwith(X),
+   fail
+  ).
+The fail is there to force backtracking. (goal1 ; goal2) means "goal1 or goal2" - try goal1 first and if it fails, try goal2.
+Concrete repeat example
+% cat someterms
+prerequisite_of(comp9322, comp9321).
+prerequisite_of(comp9332, comp9331).
+prerequisite_of(comp9415, comp9024).
+stop.
+more.
+
+% cat dountilstop.pl
+dountilstop :-
+  repeat,
+  read(X),
+  (X = stop, !
+   ;
+   print(X), nl,
+   fail
+  ).
+
+% prolog -s dountilstop.pl
+?- see(someterms).
+true.
+?- dountilstop.
+prerequisite_of(comp9322, comp9321)
+prerequisite_of(comp9332, comp9331)
+prerequisite_of(comp9415, comp9024)
+true.
+not
+In Prolog, \+, pronounced "not" is built in, but can be defined as:
+
+\+(P) :-
+	P, !, fail
+	;
+	true.
+This says "if P succeeds, then fail (and do not backtrack). Otherwise, succeed." In other words, \+(P) succeeds if P cannot be proven, and fails if P can be proven. \+(P) may also be written as \+ P
+This form of negation is known as negation as failure, and it depends on the closed world assumption that everything worth knowing is known to Prolog or is provable by Prolog.
+
+It is better to use X \== Y than \+(X == Y) and similarly for other comparison operators which possess a built-in negation.
+
+You may also see not(P), an older form, now deprecated.
+
+\+ is supposed to be a mnemonic for not (\) provable (+).
+
+For an example of \+ in action, see The path Program, below.
+
+setof
+Backtracking in Prolog lets us find all the solutions to a goal or list of goals. However, these goals are produced separately. Sometimes one would like a list of all the solutions. This is what setof and findall are for.
+
+% cat happy.pl
+happy(fido).
+happy(rex).
+happy(lassie).
+% prolog -s happy.pl
+
+?- setof(X, happy(X), List).
+List = [fido, lassie, rex]
+Prolog finds all solutions, sorts them, removes any duplicates, and binds the resulting list to List.
+
+findall
+What if you want to keep the duplicates?
+
+% cat happy2.pl
+movie_star(rintintin). movie_star(lassie).
+happy(fido). happy(rex). happy(lassie).
+happy(X) :- movie_star(X).
+% prolog -s happy2.pl
+?- setof(X, happy(X), List).
+List = [fido, lassie, rex, rintintin]
+
+?- findall(X, happy(X), List).
+List = [fido, rex, lassie, rintintin, lassie]
+Note that if they can't find any items that satisfy the predicate, in SWI Prolog, findall succeeds and binds the list to [], while setof fails.

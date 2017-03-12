@@ -1,0 +1,38 @@
+Nama		: Awang Jordi Saputra
+NIM		: 1515015218
+Praktikan	: C2/Kecerdasan Buatan
+Tugas		: Tugas2
+		  Nomer 1 & 2 (format .txt)
+1.
+a)	orang(dian). 		 //dian adalah nama orang
+b)	mobil(atoz). 		 //atoz adalah nama mobil/merk
+c)	suka(dian,atoz).	 //jika di atas sudah di deklarasikan dian adalah
+				   nama orang kemudian atoz adalah nama mobil
+				   maksudnya adalah. Diaz menyukai mobil
+				   bermerk/bernama atoz.
+d)	dijual(atoz).		 // mobil ber merek atoz dijual
+e)	dapat_membeli(X,Y):-     // untuk dapat memenuhi kondisi dapat_membeli
+	orang(X),    		    diperlukan X dan Y. dimana X sendiri adalah
+	mobil(Y),    		    orang yang ingin membeli mobil, kemudian
+	suka(X,Y),    		    mobil tersebut adalah sesuai dengan yang di
+	dijual(Y). 		    suka oleh si X(orang) dan kemudian ada dijual.
+f)	suka(_,Apa).		  // _ adalah X(orang) kemudian Apa(Y).
+				     maksudnya adalah menampilkan orang(X) kemudian
+				     menampilkan apa yang disuka oleh orang(X)
+				     yang sesuai dengan suka(Y), jadi suka(_,Apa)
+				     atau suka(X,Y).
+
+2.
+a) 	hoby(ricky,catur)
+b)	sifat(embang,pemalas)
+c)	makan(yusida,vegetarian)
+d)	pandai(kusdiar,gitar)
+e)	mobil(sadek,merah).   
+	mobil(merah,sadek).
+	mobil(sadek,bmw).
+f)	orang(awan,piano)
+	orang(awan,pontianak)
+	orang(pontianak,jawa)	 	
+g)	baik(orang,sifat)if(penyayang,dermawan)
+h)	pintar(orang,nilaitinggi) if pintar(matematika,nilaitinggi);pintar(ipa,nilaitinggi);
+	pintar(ips,nilaitinggi).
